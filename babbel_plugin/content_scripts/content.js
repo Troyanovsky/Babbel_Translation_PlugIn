@@ -1,27 +1,27 @@
 document.addEventListener('mousedown', function(event) {
     if (event.ctrlKey || event.metaKey) {
-        console.log('ctrl or command key pressed and mouse button down');
+        console.log('Ctrl or command key pressed and mouse button down');
         document.addEventListener('mouseup', function mouseUpHandler() {
             var selectedText = window.getSelection().toString();
-            if (selectedText !== '') {
-                console.log('text selected');
+            if (selectedText !== '' && selectedText.length <= 35){
+                console.log('Text selected');
                 var sel = window.getSelection();
                 if (sel.rangeCount) {
-                    console.log('range count is not zero');
+                    console.log('Range count is not zero. Calling Translation API.');
                     var range = sel.getRangeAt(0);
 
-                    const url = 'https://google-translate1.p.rapidapi.com/language/translate/v2';
+                    const url = 'https://translate281.p.rapidapi.com/';
                     const options = {
                         method: 'POST',
                         headers: {
                             'content-type': 'application/x-www-form-urlencoded',
-                            'Accept-Encoding': 'application/gzip',
-                            'X-RapidAPI-Key': '<replace with your rapid api key, get one here: https://rapidapi.com/hub>',
-                            'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
+                            'X-RapidAPI-Key': '',
+                            'X-RapidAPI-Host': 'translate281.p.rapidapi.com'
                         },
                         body: new URLSearchParams({
-                            q: selectedText,
-                            target: 'en'
+                            text: selectedText,
+                            from: 'auto',
+                            to: 'en'
                         })
                     };
 
@@ -35,8 +35,8 @@ document.addEventListener('mousedown', function(event) {
                         return response.json();
                     })
                     .then(data => {
-                        console.log('Translation received: ', data.data.translations[0].translatedText);
-                        var translatedText = data.data.translations[0].translatedText;
+                        console.log('Translation received: ', data.response);
+                        var translatedText = data.response;
                         var newTextNode = document.createTextNode('[' + translatedText + ']');
                         
                         range.deleteContents();
@@ -62,6 +62,8 @@ document.addEventListener('mousedown', function(event) {
                         sel.addRange(range);
                     });
                 }
+            } else {
+                console.log('Text not selected or too long');
             }
             // Remove the mouseup event listener after handling it once
             document.removeEventListener('mouseup', mouseUpHandler);
