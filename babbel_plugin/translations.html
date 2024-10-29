@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation History</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            min-width: 400px;
+            padding: 10px;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px;
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            text-align: left;
+        }
+        th { background-color: #f2f2f2; }
+        .debug { color: blue; font-size: 12px; }
+        .error { color: red; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h2>Translation History</h2>
+    <div id="debug" class="debug"></div>
+    <div id="error" class="error"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Original</th>
+                <th>Translation</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody id="translation-list"></tbody>
+    </table>
+
+    <script src="popup.js"></script>
+</body>
+</html> 

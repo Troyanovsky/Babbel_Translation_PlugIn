@@ -1,13 +1,23 @@
+// Debug flag - set to false in production
+const DEBUG = true;
+
+// Debug logging function
+function debugLog(...args) {
+    if (DEBUG) {
+        console.log(...args);
+    }
+}
+
 document.addEventListener('mousedown', function(event) {
     if (event.ctrlKey || event.metaKey) {
-        console.log('Ctrl or command key pressed and mouse button down');
+        debugLog('Ctrl or command key pressed and mouse button down');
         document.addEventListener('mouseup', function mouseUpHandler() {
             var selectedText = window.getSelection().toString();
             if (selectedText !== '' && selectedText.length <= 35){
-                console.log('Text selected');
+                debugLog('Text selected');
                 var sel = window.getSelection();
                 if (sel.rangeCount) {
-                    console.log('Range count is not zero. Calling Translation API.');
+                    debugLog('Range count is not zero. Calling Translation API.');
                     var range = sel.getRangeAt(0);
 
                     const url = 'https://translate281.p.rapidapi.com/';
@@ -28,16 +38,38 @@ document.addEventListener('mousedown', function(event) {
                     fetch(url, options)
                     .then(response => {
                         if (!response.ok) {
-                            console.log('Translation API response not ok, status:', response.status);
-                            console.log('Selected text was:', selectedText);
+                            debugLog('Translation API response not ok, status:', response.status);
+                            debugLog('Selected text was:', selectedText);
                             throw new Error('Network response was not ok');
                         }
                         return response.json();
                     })
                     .then(data => {
-                        console.log('Translation received: ', data.response);
+                        debugLog('Translation received: ', data.response);
                         var translatedText = data.response;
                         var newTextNode = document.createTextNode('[' + translatedText + ']');
+                        
+                        // Store the translation with timestamp
+                        chrome.storage.local.get({translations: []}, function(result) {
+                            debugLog('Current translations:', result.translations);
+                            
+                            const translations = result.translations;
+                            translations.push({
+                                original: selectedText,
+                                translated: translatedText,
+                                timestamp: new Date().toISOString()
+                            });
+                            
+                            chrome.storage.local.set({translations: translations}, function() {
+                                debugLog('Translation stored successfully');
+                                debugLog('Updated translations:', translations);
+                                
+                                // Verify the storage
+                                chrome.storage.local.get('translations', function(data) {
+                                    debugLog('Current stored translations:', data.translations);
+                                });
+                            });
+                        });
                         
                         range.deleteContents();
                         range.insertNode(newTextNode);
@@ -63,7 +95,7 @@ document.addEventListener('mousedown', function(event) {
                     });
                 }
             } else {
-                console.log('Text not selected or too long');
+                debugLog('Text not selected or too long');
             }
             // Remove the mouseup event listener after handling it once
             document.removeEventListener('mouseup', mouseUpHandler);
