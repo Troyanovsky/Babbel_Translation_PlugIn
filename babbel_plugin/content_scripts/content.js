@@ -49,26 +49,28 @@ document.addEventListener('mousedown', function(event) {
                         var translatedText = data.response;
                         var newTextNode = document.createTextNode('[' + translatedText + ']');
                         
-                        // Store the translation with timestamp
+                        // Store the translation with timestamp if it doesn't exist
                         chrome.storage.local.get({translations: []}, function(result) {
                             debugLog('Current translations:', result.translations);
                             
                             const translations = result.translations;
-                            translations.push({
-                                original: selectedText,
-                                translated: translatedText,
-                                timestamp: new Date().toISOString()
-                            });
+                            // Check if the original text already exists in translations
+                            const exists = translations.some(t => t.original === selectedText);
                             
-                            chrome.storage.local.set({translations: translations}, function() {
-                                debugLog('Translation stored successfully');
-                                debugLog('Updated translations:', translations);
-                                
-                                // Verify the storage
-                                chrome.storage.local.get('translations', function(data) {
-                                    debugLog('Current stored translations:', data.translations);
+                            if (!exists) {
+                                translations.push({
+                                    original: selectedText,
+                                    translated: translatedText,
+                                    timestamp: new Date().toISOString()
                                 });
-                            });
+                                
+                                chrome.storage.local.set({translations: translations}, function() {
+                                    debugLog('Translation stored successfully');
+                                    debugLog('Updated translations:', translations);
+                                });
+                            } else {
+                                debugLog('Translation already exists in history');
+                            }
                         });
                         
                         range.deleteContents();
