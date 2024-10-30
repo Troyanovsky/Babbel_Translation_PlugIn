@@ -21,6 +21,9 @@ function clearTranslations() {
     }
 }
 
+// Add sort state to track current sorting method
+let currentSort = 'time'; // 'time' or 'alpha'
+
 function loadTranslations() {
     log('Starting to load translations...');
     
@@ -41,18 +44,27 @@ function loadTranslations() {
             return;
         }
 
-        // Sort translations by timestamp (newest first)
-        translations
-            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-            .forEach(translation => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${translation.original || 'N/A'}</td>
-                    <td>${translation.translated || 'N/A'}</td>
-                    <td>${new Date(translation.timestamp).toLocaleString()}</td>
-                `;
-                tbody.appendChild(row);
-            });
+        // Sort translations based on current sort method
+        const sortedTranslations = [...translations].sort((a, b) => {
+            if (currentSort === 'time') {
+                return new Date(b.timestamp) - new Date(a.timestamp);
+            } else {
+                return a.original.localeCompare(b.original);
+            }
+        });
+
+        sortedTranslations.forEach(translation => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${translation.original || 'N/A'}</td>
+                <td>${translation.translated || 'N/A'}</td>
+                <td>${new Date(translation.timestamp).toLocaleString()}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Update sort button text
+        sortButton.textContent = currentSort === 'time' ? 'Sort: Time ⌚' : 'Sort: A-Z 🔤';
     });
 }
 
@@ -80,9 +92,18 @@ clearButton.style.border = 'none';
 clearButton.style.padding = '5px 10px';
 clearButton.style.cursor = 'pointer';
 
+// Add sort button
+const sortButton = document.createElement('button');
+sortButton.textContent = 'Sort: Time ⌚';
+sortButton.onclick = () => {
+    currentSort = currentSort === 'time' ? 'alpha' : 'time';
+    loadTranslations();
+};
+
 // Add buttons to container
 buttonContainer.appendChild(refreshButton);
 buttonContainer.appendChild(clearButton);
+buttonContainer.appendChild(sortButton);
 
 // Add button container before table
 document.body.insertBefore(buttonContainer, document.querySelector('table')); 

@@ -1,0 +1,3 @@
+const CONFIG = {
+    RAPID_API_KEY: ''
+}; 

@@ -25,7 +25,7 @@ document.addEventListener('mousedown', function(event) {
                         method: 'POST',
                         headers: {
                             'content-type': 'application/x-www-form-urlencoded',
-                            'X-RapidAPI-Key': '',
+                            'X-RapidAPI-Key': CONFIG.RAPID_API_KEY,
                             'X-RapidAPI-Host': 'translate281.p.rapidapi.com'
                         },
                         body: new URLSearchParams({
