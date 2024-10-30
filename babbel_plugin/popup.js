@@ -100,10 +100,42 @@ sortButton.onclick = () => {
     loadTranslations();
 };
 
+// Add export function
+function exportTranslations() {
+    chrome.storage.local.get('translations', function(data) {
+        const translations = data.translations || [];
+        
+        // Create a Blob with the JSON data
+        const blob = new Blob([JSON.stringify(translations, null, 2)], {
+            type: 'application/json'
+        });
+        
+        // Create download link
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `translations_${new Date().toISOString().split('T')[0]}.json`;
+        
+        // Trigger download
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+}
+
+// Add export button
+const exportButton = document.createElement('button');
+exportButton.textContent = 'Export 📥';
+exportButton.onclick = exportTranslations;
+
 // Add buttons to container
 buttonContainer.appendChild(refreshButton);
-buttonContainer.appendChild(clearButton);
 buttonContainer.appendChild(sortButton);
+buttonContainer.appendChild(clearButton);
+buttonContainer.appendChild(exportButton);
 
 // Add button container before table
 document.body.insertBefore(buttonContainer, document.querySelector('table')); 
