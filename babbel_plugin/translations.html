@@ -45,6 +45,19 @@
         tr:hover {
             background-color: #f1f4f7;
         }
+        .delete-btn {
+            cursor: pointer;
+            color: #ff4444;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .delete-btn:hover {
+            background-color: #ffeeee;
+        }
+        th:last-child {
+            width: 50px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -55,6 +68,7 @@
                 <th>Original</th>
                 <th>Translation</th>
                 <th>Time</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody id="translation-list"></tbody>

@@ -59,7 +59,18 @@ function loadTranslations() {
                 <td>${translation.original || 'N/A'}</td>
                 <td>${translation.translated || 'N/A'}</td>
                 <td>${new Date(translation.timestamp).toLocaleString()}</td>
+                <td style="text-align: center">
+                    <span class="delete-btn" title="Delete">🗑️</span>
+                </td>
             `;
+            
+            // Add click handler for delete button
+            row.querySelector('.delete-btn').addEventListener('click', () => {
+                if (confirm('Are you sure you want to delete this translation?')) {
+                    deleteTranslation(translation.timestamp);
+                }
+            });
+            
             tbody.appendChild(row);
         });
 
@@ -138,4 +149,17 @@ buttonContainer.appendChild(clearButton);
 buttonContainer.appendChild(exportButton);
 
 // Add button container before table
-document.body.insertBefore(buttonContainer, document.querySelector('table')); 
+document.body.insertBefore(buttonContainer, document.querySelector('table'));
+
+// Add this new function to handle deletion
+function deleteTranslation(timestamp) {
+    chrome.storage.local.get('translations', function(data) {
+        const translations = data.translations || [];
+        const updatedTranslations = translations.filter(t => t.timestamp !== timestamp);
+        
+        chrome.storage.local.set({translations: updatedTranslations}, function() {
+            log('Translation deleted');
+            loadTranslations(); // Reload the list
+        });
+    });
+}
